@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Books</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="flashes">
+      {% for m in messages %}
+      <li>{{ m }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+
+  <form method="get" action="/">
+    <label for="sort">Sort by:</label>
+    <select id="sort" name="sort" onchange="this.form.submit()">
+      <option value="title"
+              {% if sort == 'title' %}selected{% endif %}>Title</option>
+      <option value="author"
+              {% if sort == 'author' %}selected{% endif %}>Author</option>
+    </select>
+  </form>
+  <form method="get" action="/">
+    <label for="search">Search Keyword:</label>
+    <input type="text" id="search" name="search" value="{{ request.args.get('search', '') }}"><br><br>
+    {% if message %}
+    <p><em>{{ message }}</em></p>
+    {% endif %}
+  </form>
+
+    {% for book, author in rows %}
+    <div class="book">
+      {% if book.isbn %}
+      <img
+        class="cover"
+        src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-M.jpg"
+        alt="Cover of {{ book.title }}"
+        onerror="this.style.display='none'">
+      {% endif %}
+
+      <div>
+        <h3>{{ book.title }}</h3>
+        <p> written by {{ author.name }}</p>
+      </div>
+      <form method="post"
+            action="{{ url_for('delete_book', book_id=book.id) }}"
+            onsubmit="return confirm('Are you sure you want to delete this book?');">
+        <button type="submit">Delete Book</button>
+      </form>
+    </div>
+    {% endfor %}
+
+  </body>
+</html>
