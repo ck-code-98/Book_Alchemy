@@ -1,5 +1,6 @@
 from flask import Flask, request, render_template, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import IntegrityError
 import os
 from data_models import db, Author, Book
 from datetime import date
@@ -21,16 +22,31 @@ def add_author():
         name = request.form.get("name", "").strip()
         birth_str = request.form.get("birth_date", "").strip()
         death_str = request.form.get("date_of_death", "").strip()
-        birth_date = date.fromisoformat(birth_str) if birth_str else None
-        date_of_death = date.fromisoformat(death_str) if death_str else None
 
-        db.session.add(Author(
-            name=name,
-            birth_date=birth_date,
-            date_of_death=date_of_death))
+        if not name:
+            flash("Name cannot be empty!", "error")
+            return render_template("add_author.html")
 
-        db.session.commit()
-        return render_template("add_author.html", message="Author added!")
+        birth_date = date.fromisoformat(birth_str).isoformat() if birth_str else None
+        date_of_death = date.fromisoformat(death_str).isoformat() if death_str else None
+
+        if Author.query.filter(Author.name == name).first():
+            flash(f"Author {name} already exists!", "error")
+            return render_template('add_author.html')
+
+        try:
+            db.session.add(Author(
+                name=name,
+                birth_date=birth_date,
+                date_of_death=date_of_death))
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            flash(f"Author {name} already exists!", "error")
+            return render_template('add_author.html')
+
+        flash(f"Author added successfully.", "success")
+        return redirect(url_for("add_author"))
 
     return render_template('add_author.html')
 
@@ -45,6 +61,13 @@ def add_book():
         publication_year_str = request.form.get("publication_year", "").strip()
         author_id = request.form.get("author_id")
 
+        if not isbn:
+            flash("ISBN cannot be empty!", "error")
+            return render_template("add_book.html", authors=authors)
+        if not title:
+            flash("Title cannot be empty!", "error")
+            return render_template("add_book.html", authors=authors)
+
         try:
             publication_year = int(publication_year_str)
         except ValueError:
@@ -55,14 +78,24 @@ def add_book():
         except ValueError:
             author_id = None
 
-        db.session.add(Book(
-            isbn=isbn,
-            title=title,
-            publication_year=publication_year,
-            author_id=author_id))
+        if Book.query.filter(Book.isbn == isbn).first():
+            flash(f"ISBN '{isbn}' already exists!", "error")
+            return render_template('add_book.html', authors=authors)
 
-        db.session.commit()
-        return render_template("add_book.html", authors=authors, message="Book added successfully!")
+        try:
+            db.session.add(Book(
+                isbn=isbn,
+                title=title,
+                publication_year=publication_year,
+                author_id=author_id))
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            flash(f"ISBN '{isbn}' already exists!", "error")
+            return render_template('add_book.html', authors=authors)
+
+        flash("Book added successfully!", "success")
+        return redirect(url_for("add_book"))
 
     return render_template('add_book.html', authors=authors)
 

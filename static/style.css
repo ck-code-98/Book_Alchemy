@@ -30,21 +30,18 @@ h1, h2, h3 { margin: 0 0 8px; line-height: 1.2; }
 p { margin: 0.25rem 0 0; color: var(--muted); }
 
 /* ===== Alerts / Messages ===== */
-.flashes, .success, .error {
-  list-style: none;
-  padding: 12px 14px;
-  border-radius: 10px;
-  margin: 14px 0 20px;
-  box-shadow: var(--shadow);
+.flash-container { margin: 1rem 0; }
+.flash-container .flash-success,
+.flash-container .flash-error {
+  padding: .5rem .75rem;
+  border-radius: .25rem;
+  margin: .25rem 0;
 }
-.flashes li { margin: 4px 0; }
-.flashes, .success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
-.error { background: #fee2e2; color: #7f1d1d; border: 1px solid #fecaca; }
 
 /* ===== Forms ===== */
 form { margin: 16px 0 24px; }
 label { display: block; font-weight: 600; margin: 10px 0 6px; }
-input[type="text"], input[type="date"], select {
+input[type="text"], input[type="date"], input[type="number"], select {
   width: 100%;
   max-width: 420px;
   padding: 10px 12px;

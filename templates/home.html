@@ -9,16 +9,20 @@
   </head>
   <body>
 
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul class="flashes">
-      {% for m in messages %}
-      <li>{{ m }}</li>
+  {% with msgs = get_flashed_messages(with_categories=true) %}
+  {% if msgs %}
+    <div class="flash-container">
+      {% for cat, msg in msgs %}
+      <div class="flash-{{ cat }}">{{ msg }}</div>
       {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
+    </div>
+  {% endif %}
+  {% endwith %}
 
+<nav>
+  <a href="{{ url_for('add_author') }}" class="btn">Add Author</a>
+  <a href="{{ url_for('add_book') }}" class="btn">Add Book</a>
+</nav>
 
   <form method="get" action="/">
     <label for="sort">Sort by:</label>
