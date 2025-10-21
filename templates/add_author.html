@@ -18,6 +18,11 @@
   {% endif %}
   {% endwith %}
 
+<nav>
+    <a href="{{ url_for('home') }}" class="btn">Home</a>
+    <a href="{{ url_for('add_book') }}" class="btn">Add Book</a>
+</nav>
+
   <form action="/add_author" method="POST">
   <label for="name">Author Name:</label>
   <input type="text" id="name" name="name" required><br><br>
